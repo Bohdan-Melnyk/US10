@@ -1,0 +1,59 @@
+Write Java Unit tests for this regex expression: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!\"#$%%&'()*+,-./:;<=>?@[\\\\]^_`{|}~])\\S{1,%d}$
+ChatGPT
+The given regular expression is intended to validate a password with the following criteria:
+
+At least one lowercase letter ((?=.*[a-z]))
+At least one uppercase letter ((?=.*[A-Z]))
+At least one digit ((?=.*\\d))
+At least one special character ((?=.*[!"#$%&'()*+,-./:;<=>?@[\\]^_{|}~])`)
+No whitespace allowed (\\S)
+Length must be from 1 to %d characters (The %d here is a placeholder that should be replaced with the actual maximum length)
+The following Java code demonstrates JUnit tests for this regular expression.
+
+java
+Copy code
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import org.junit.jupiter.api.Test;
+
+import java.util.regex.Pattern;
+
+public class PasswordRegexTest {
+
+    private static final int MAX_LENGTH = 20; // Replace with your desired maximum length
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
+            String.format("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!\"#$%%&'()*+,-./:;<=>?@[\\\\]^_`{|}~])\\S{1,%d}$", MAX_LENGTH));
+
+    @Test
+    public void testValidPasswords() {
+        assertTrue(PASSWORD_PATTERN.matcher("Password123!").matches());
+        assertTrue(PASSWORD_PATTERN.matcher("Aa1!").matches());
+        assertTrue(PASSWORD_PATTERN.matcher("StrongP@ssw0rd").matches());
+    }
+
+    @Test
+    public void testInvalidPasswords() {
+        assertFalse(PASSWORD_PATTERN.matcher("password").matches()); // no uppercase, digit or special character
+        assertFalse(PASSWORD_PATTERN.matcher("Password").matches()); // no digit or special character
+        assertFalse(PASSWORD_PATTERN.matcher("Password123").matches()); // no special character
+        assertFalse(PASSWORD_PATTERN.matcher("Password!").matches()); // no digit
+        assertFalse(PASSWORD_PATTERN.matcher("P@ss").matches()); // too short, depending on MAX_LENGTH
+        assertFalse(PASSWORD_PATTERN.matcher(" ").matches()); // whitespace not allowed
+        assertFalse(PASSWORD_PATTERN.matcher("").matches()); // empty string
+        assertFalse(PASSWORD_PATTERN.matcher("AReallyLongPasswordThatExceedsTheGivenMaxLength!1").matches()); // too long, depending on MAX_LENGTH
+    }
+}
+To run these tests, you'll need to include the JUnit 5 library in your project. If you're using Maven, you can add the following dependency:
+
+xml
+Copy code
+<dependencies>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>5.8.0</version> <!-- Check for the latest version -->
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+Make sure to import the JUnit classes at the top of your Java file. Then, you can execute the tests to validate the regex expression.
